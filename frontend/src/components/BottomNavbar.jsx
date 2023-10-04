@@ -13,7 +13,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 export default function BottomNavbar() {
   const [value, setValue] = useState(0);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -47,19 +47,19 @@ export default function BottomNavbar() {
         {loggedIn && (
           <BottomNavigationAction
             label="Bookings"
-            value="/bookings"
+            value="/Bookings"
             icon={<FormatListBulletedIcon />}
           />
         )}
         <BottomNavigationAction
           label="Blog"
-          value="/blog"
+          value="/Blog"
           icon={<CommentIcon />}
         />
         {loggedIn && (
           <BottomNavigationAction
             label="Profile"
-            value="/profile"
+            value="/Profile"
             icon={<AccountBoxIcon />}
           />
         )}
