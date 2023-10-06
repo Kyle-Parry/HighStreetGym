@@ -22,10 +22,10 @@ export function Users(
   };
 }
 
-export async function getByID(userID) {
+export async function getByID(userId) {
   const [userResults] = await db.query(
     "SELECT * FROM users WHERE userId = ?",
-    userID
+    userId
   );
 
   if (userResults.length > 0) {
@@ -36,6 +36,7 @@ export async function getByID(userID) {
         userResult.email,
         userResult.password,
         userResult.role,
+        userResult.phone,
         userResult.firstName,
         userResult.lastName,
         userResult.authKey
@@ -102,11 +103,30 @@ export async function create(user) {
         "VALUES (?, ?, ?, ?, ?, ?)",
       [
         user.email,
-        user.hashedPassword,
+        user.password,
         user.role,
         user.phone,
         user.firstName,
         user.lastName,
+      ]
+    )
+    .then(([result]) => {
+      return { ...user, userId: result.insertId };
+    });
+}
+
+export async function update(user) {
+  return db
+    .query(
+      "UPDATE users SET email = ?, password = ?, role = ?, phone = ?, firstName = ?, lastName = ? WHERE userId = ?",
+      [
+        user.email,
+        user.password,
+        user.role,
+        user.phone,
+        user.firstName,
+        user.lastName,
+        user.userId,
       ]
     )
     .then(([result]) => {
@@ -126,4 +146,8 @@ export async function updateAuth(user) {
     console.error("Database error:", error);
     throw new Error("Database error: " + error.message);
   }
+}
+
+export async function deleteById(userId) {
+  return db.query("DELETE FROM users WHERE userId = ?", userId);
 }

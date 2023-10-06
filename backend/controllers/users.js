@@ -4,7 +4,10 @@ import {
   getByEmail,
   updateAuth,
   create,
+  update,
   getByAuthKey,
+  getByID,
+  deleteById,
 } from "../models/users.js";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
@@ -72,10 +75,22 @@ userController.post("/logout", (req, res) => {
 });
 
 userController.get("/:id", (req, res) => {
-  res.status(501).json({
-    status: 501,
-    message: "Get user by ID not yet implemented",
-  });
+  const userId = req.params.id;
+
+  getByID(userId)
+    .then((user) => {
+      res.status(200).json({
+        status: 200,
+        message: "Get user by ID",
+        user: user,
+      });
+    })
+    .catch((error) => {
+      res.status(500).json({
+        status: 500,
+        message: "Failed to get user by ID",
+      });
+    });
 });
 
 userController.get("/key/:authKey", (req, res) => {
@@ -140,18 +155,139 @@ userController.post("/create", async (req, res) => {
   }
 });
 
-userController.post("/update", (req, res) => {
-  res.status(501).json({
-    status: 501,
-    message: "Update user not yet implemented",
-  });
+userController.post("/update", async (req, res) => {
+  const { userId, email, password, role, phone, firstName, lastName } =
+    req.body;
+
+  let hashedPassword = password;
+  if (!password.startsWith("$2a")) {
+    hashedPassword = bcrypt.hashSync(password, 10);
+  }
+
+  const user = Users(
+    userId,
+    email,
+    hashedPassword,
+    role,
+    phone,
+    firstName,
+    lastName,
+    null
+  );
+
+  update(user)
+    .then((user) => {
+      res.status(200).json({
+        status: 200,
+        message: "Updated user",
+        user: user,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({
+        status: 500,
+        message: "Failed to update user",
+      });
+    });
 });
 
-userController.post("/delete", (req, res) => {
-  res.status(501).json({
-    status: 501,
-    message: "Delete user not yet implemented",
-  });
+userController.post("/register", async (req, res) => {
+  const { email, password, phone, firstName, lastName } = req.body;
+
+  if (!password) {
+    return res.status(400).json({
+      status: 400,
+      message: "Password is required",
+    });
+  }
+
+  // Hash the password if it isn't already hashed
+  let hashedPassword = password;
+  if (!password.startsWith("$2a")) {
+    hashedPassword = bcrypt.hashSync(password, 10);
+  }
+
+  // Create a new user object with hashed password
+  const user = Users(
+    null,
+    email,
+    hashedPassword,
+    "user",
+    phone,
+    firstName,
+    lastName,
+    null
+  );
+  console.log(user);
+  try {
+    const result = await create(user);
+    res.status(200).json({
+      status: 200,
+      message: "Created user",
+      user: result,
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Failed to create user",
+    });
+  }
+});
+
+userController.post("/profile", async (req, res) => {
+  const { email, password, phone, firstName, lastName } = req.body;
+
+  let hashedPassword = password;
+  if (!password.startsWith("$2a")) {
+    hashedPassword = bcrypt.hashSync(password, 10);
+  }
+
+  const user = Users(
+    null,
+    email,
+    hashedPassword,
+    null,
+    phone,
+    firstName,
+    lastName,
+    null
+  );
+
+  update(user)
+    .then((user) => {
+      res.status(200).json({
+        status: 200,
+        message: "Updated user",
+        user: user,
+      });
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({
+        status: 500,
+        message: "Failed to update user",
+      });
+    });
+});
+
+userController.delete("/:id", (req, res) => {
+  const userId = req.params.id;
+
+  deleteById(userId)
+    .then((result) => {
+      res.status(200).json({
+        status: 200,
+        message: "User deleted",
+      });
+    })
+    .catch((error) => {
+      res.status(500).json({
+        status: 500,
+        message: "Failed to delete user",
+      });
+    });
 });
 
 export default userController;
