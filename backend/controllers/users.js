@@ -11,6 +11,7 @@ import {
 } from "../models/users.js";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
+import xml2js from "xml2js";
 
 const userController = Router();
 
@@ -113,46 +114,77 @@ userController.get("/key/:authKey", (req, res) => {
 });
 
 userController.post("/create", async (req, res) => {
-  const { email, password, role, phone, firstName, lastName } = req.body;
+  const parser = new xml2js.Parser({ explicitArray: false });
+  // Get the XML data from the request body
+  const xmlData = req.body;
 
-  if (!password) {
+  if (!xmlData) {
     return res.status(400).json({
       status: 400,
-      message: "Password is required",
+      message: "XML data is required",
     });
   }
 
-  // Hash the password if it isn't already hashed
-  let hashedPassword = password;
-  if (!password.startsWith("$2a")) {
-    hashedPassword = bcrypt.hashSync(password, 10);
-  }
+  // Parse the XML data
+  parser.parseString(xmlData, async (err, result) => {
+    console.log(xmlData);
+    if (err) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid XML data",
+      });
+    }
 
-  // Create a new user object with hashed password
-  const user = Users(
-    null,
-    email,
-    hashedPassword,
-    role,
-    phone,
-    firstName,
-    lastName,
-    null
-  );
+    // Ensure that 'result' and 'result.user' are not null
+    if (!result || !result.user) {
+      return res.status(400).json({
+        status: 400,
+        message: "Invalid XML structure: 'user' element not found",
+      });
+    }
 
-  try {
-    const result = await create(user);
-    res.status(200).json({
-      status: 200,
-      message: "Created user",
-      user: result,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 500,
-      message: "Failed to create user",
-    });
-  }
+    // Extract user information from the parsed XML
+    const { email, password, role, phone, firstName, lastName } = result.user;
+
+    if (!password) {
+      return res.status(400).json({
+        status: 400,
+        message: "Password is required",
+      });
+    }
+
+    // Hash the password if it isn't already hashed
+    let hashedPassword = password;
+    if (!password.startsWith("$2a")) {
+      hashedPassword = bcrypt.hashSync(password, 10);
+    }
+
+    // Create a new user object with hashed password
+    const user = Users(
+      null,
+      email,
+      hashedPassword,
+      role,
+      phone,
+      firstName,
+      lastName,
+      null
+    );
+
+    try {
+      const createUserResult = await create(user);
+      res.status(200).json({
+        status: 200,
+        message: "Created user",
+        user: createUserResult,
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: "Failed to create user",
+      });
+    }
+  });
 });
 
 userController.post("/update", async (req, res) => {
