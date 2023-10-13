@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -7,18 +6,40 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
+import React, { useState, useContext } from "react"; // Make sure you import React
+import { useNavigate } from "react-router-dom";
+import { AuthenticationContext } from "../hooks/auth";
 
 const LoginPage = () => {
-  const login = async (e) => {
+  const { login } = useContext(AuthenticationContext); // Access the login function
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
     e.preventDefault();
+
+    // Retrieve the email and password from your form input fields
+    const email = e.target.email.value;
+    const password = e.target.password.value;
+
+    try {
+      // Call the login function from your authentication context to log in the user
+      await login(email, password);
+
+      // If login is successful, you can redirect the user to another page
+      navigate("/dashboard"); // Make sure you have 'navigate' from 'react-router-dom' available
+    } catch (error) {
+      console.error("Login failed:", error);
+      // Handle login error, such as displaying an error message
+    }
   };
+
   return (
     <>
       <CssBaseline />
       <Container maxWidth="sm">
         <Box
           component="form"
-          onSubmit={login}
+          onSubmit={handleLogin} // Use the handleLogin function
           sx={{
             display: "flex",
             bgcolor: "#cfe8fc",
@@ -64,7 +85,6 @@ const LoginPage = () => {
             gutterBottom
             sx={{
               textAlign: "center",
-
               color: "red",
             }}
           ></Typography>
