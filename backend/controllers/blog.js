@@ -1,9 +1,18 @@
 import { Router } from "express";
-import { create, update, getAll, getByID, deleteById } from "../models/blog.js";
+import {
+  Blogs,
+  create,
+  update,
+  getAll,
+  getByID,
+  deleteById,
+} from "../models/blog.js";
+import xml2js from "xml2js";
+import auth from "../middleware/auth.js";
 
 const blogController = Router();
 
-blogController.get("/", async (req, res) => {
+blogController.get("/", auth(["admin", "user"]), async (req, res) => {
   try {
     const blogPosts = await getAll();
 
@@ -27,7 +36,7 @@ blogController.get("/", async (req, res) => {
   }
 });
 
-blogController.get("/:id", async (req, res) => {
+blogController.get("/:id", auth(["admin", "user"]), async (req, res) => {
   const blogId = req.params.id;
 
   try {
@@ -53,12 +62,12 @@ blogController.get("/:id", async (req, res) => {
   }
 });
 
-blogController.post("/upload/xml", (req, res) => {
+blogController.post("/upload/xml", auth(["admin"]), (req, res) => {
+  console.log(req.files);
   if (req.files && req.files["xml-file"]) {
     // Access the XML file as a string
     const XMLFile = req.files["xml-file"];
     const file_text = XMLFile.data.toString();
-
     // Set up XML parser
     const parser = new xml2js.Parser();
     parser
@@ -69,8 +78,7 @@ blogController.post("/upload/xml", (req, res) => {
         const operation = blogUploadAttributes["operation"];
         // Slightly painful indexing to reach nested children
         const blogData = blogUpload["blogs"][0]["blog"];
-
-        if (operation == "insert") {
+        if (operation === "insert") {
           Promise.all(
             blogData.map((blogData) => {
               // Convert the xml object into a model object
@@ -145,7 +153,7 @@ blogController.post("/upload/xml", (req, res) => {
   }
 });
 
-blogController.post("/delete", (req, res) => {
+blogController.post("/delete", auth(["admin"]), (req, res) => {
   const blogId = req.params.id;
 
   deleteById(blogId)

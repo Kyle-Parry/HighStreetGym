@@ -8,10 +8,10 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import Link from "@mui/material/Link";
 
-const ImportClassPage = (onUploadSuccess) => {
+const ImportBlogPage = (onUploadSuccess) => {
   const fileRef = useRef(null);
   const [statusMessage, setStatusMessage] = useState("");
-  const importClass = async (e) => {
+  const importBlog = async (e) => {
     e.preventDefault();
 
     // Files is an array because the user could select multiple files
@@ -23,7 +23,7 @@ const ImportClassPage = (onUploadSuccess) => {
     const formData = new FormData();
     formData.append("xml-file", file);
 
-    fetch("http://localhost:8080/classes/upload/xml", {
+    fetch("http://localhost:8080/blog/upload/xml", {
       method: "POST",
       body: formData,
     })
@@ -41,14 +41,14 @@ const ImportClassPage = (onUploadSuccess) => {
         setStatusMessage("Upload failed - " + error);
       });
   };
-  const file = useRef(null);
+
   return (
     <>
       <CssBaseline />
       <Container maxWidth="sm">
         <Box
           component="form"
-          onSubmit={importClass}
+          onSubmit={importBlog}
           sx={{
             display: "flex",
             bgcolor: "#cfe8fc",
@@ -71,7 +71,7 @@ const ImportClassPage = (onUploadSuccess) => {
               paddingBottom: "15%",
             }}
           >
-            Import Class
+            Import Blog
           </Typography>
           <TextField
             required
@@ -101,4 +101,4 @@ const ImportClassPage = (onUploadSuccess) => {
   );
 };
 
-export default ImportClassPage;
+export default ImportBlogPage;

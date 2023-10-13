@@ -1,23 +1,61 @@
 import { Router } from "express";
-import * as Classes from "../models/classes.js";
+import { getAll, create, update, deleteById } from "../models/classes.js";
+import xml2js from "xml2js";
+import auth from "../middleware/auth.js";
 
 const classController = Router();
 
-classController.get("/", (req, res) => {
-  res.status(501).json({
-    status: 501,
-    message: "Get all classes not yet implemented",
-  });
+classController.get("/", auth(["admin", "user"]), async (req, res) => {
+  try {
+    const gymClasses = await getAll();
+
+    if (gymClasses.length === 0) {
+      res.status(404).json({
+        status: 404,
+        message: "No classes found",
+      });
+    } else {
+      res.status(200).json({
+        status: 200,
+        message: "Get all classes",
+        gymClasses: gymClasses,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Failed to get classes",
+    });
+  }
 });
 
-classController.get("/:id", (req, res) => {
-  res.status(501).json({
-    status: 501,
-    message: "Get class by ID not yet implemented",
-  });
+classController.get("/:id", auth(["admin", "user"]), async (req, res) => {
+  const classId = req.params.id;
+
+  try {
+    const gymClass = await getByID(classId);
+
+    if (!gymClass) {
+      res.status(404).json({
+        status: 404,
+        message: "class not found",
+      });
+    } else {
+      res.status(200).json({
+        status: 200,
+        message: "Get class by ID",
+        gymClass: gymClass,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Failed to get gymClass by ID",
+    });
+  }
 });
 
-classController.post("/upload/xml", (req, res) => {
+classController.post("/upload/xml", auth(["admin"]), (req, res) => {
   if (req.files && req.files["xml-file"]) {
     // Access the XML file as a string
     const XMLFile = req.files["xml-file"];
@@ -66,7 +104,7 @@ classController.post("/upload/xml", (req, res) => {
             classData.map((classData) => {
               // Convert the xml object into a model object
               const classModel = Users(
-                classData.blogId.toString(),
+                classData.classId.toString(),
                 null,
                 classData.locationId.toString(),
                 classData.activityId.toString(),
@@ -109,11 +147,22 @@ classController.post("/upload/xml", (req, res) => {
   }
 });
 
-classController.post("/delete", (req, res) => {
-  res.status(501).json({
-    status: 501,
-    message: "Delete class not yet implemented",
-  });
+classController.post("/delete", auth(["admin"]), (req, res) => {
+  const classId = req.params.id;
+
+  deleteById(classId)
+    .then((result) => {
+      res.status(200).json({
+        status: 200,
+        message: "class deleted",
+      });
+    })
+    .catch((error) => {
+      res.status(500).json({
+        status: 500,
+        message: "Failed to delete class",
+      });
+    });
 });
 
 export default classController;

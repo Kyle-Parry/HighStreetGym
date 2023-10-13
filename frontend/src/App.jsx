@@ -5,7 +5,10 @@ import Timetable from "./components/Timetable";
 import RegisterPage from "./components/Register";
 import ProfilePage from "./components/ProfilePage";
 import ImportClassPage from "./components/ImportClassPage";
-import CreateBlogPage from "./components/CreateBlogPage";
+import ImportBlogPage from "./components/ImportBlog";
+import { RestrictedRoute } from "./components/RestrictedRoute";
+import BookingPage from "./components/BookingPage";
+import BlogPage from "./components/BlogPage";
 
 function App() {
   return (
@@ -13,11 +16,57 @@ function App() {
       <BottomNavbar />
       <Routes>
         <Route path="/" element={<LoginPage />} />
-        <Route path="/Timetable" element={<Timetable />} />
         <Route path="/Register" element={<RegisterPage />} />
-        <Route path="/Profile" element={<ProfilePage />} />
-        <Route path="/Import" element={<ImportClassPage />} />
-        <Route path="/Create-Blog" element={<CreateBlogPage />} />
+
+        <Route
+          path="/Timetable"
+          element={
+            <RestrictedRoute allowedRoles={["admin", "user"]}>
+              <Timetable />
+            </RestrictedRoute>
+          }
+        />
+        <Route
+          path="/Profile"
+          element={
+            <RestrictedRoute allowedRoles={["admin", "user"]}>
+              <ProfilePage />
+            </RestrictedRoute>
+          }
+        />
+        <Route
+          path="/Bookings"
+          element={
+            <RestrictedRoute allowedRoles={["admin", "user"]}>
+              <BookingPage />
+            </RestrictedRoute>
+          }
+        />
+        <Route
+          path="/Blog"
+          element={
+            <RestrictedRoute allowedRoles={["admin", "user"]}>
+              <BlogPage />
+            </RestrictedRoute>
+          }
+        />
+
+        <Route
+          path="/ImportClass"
+          element={
+            <RestrictedRoute allowedRoles={["admin", "user"]}>
+              <ImportClassPage />
+            </RestrictedRoute>
+          }
+        />
+        <Route
+          path="/ImportBlog"
+          element={
+            <RestrictedRoute allowedRoles={["admin", "user"]}>
+              <ImportBlogPage />
+            </RestrictedRoute>
+          }
+        />
       </Routes>
     </div>
   );

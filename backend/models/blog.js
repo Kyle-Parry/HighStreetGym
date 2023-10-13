@@ -35,7 +35,7 @@ export async function getByID(blogId) {
   if (allBlogPosts.length > 0) {
     const allBlogPost = allBlogPosts[0];
     return Promise.resolve(
-      Users(
+      Blogs(
         allBlogPosts.blogId,
         allBlogPosts.blogDateTime,
         allBlogPosts.userId,
@@ -50,11 +50,10 @@ export async function getByID(blogId) {
 
 export async function create(blog) {
   return db
-    .query("INSERT INTO users (userId, title, content) " + "VALUES (?, ?, ?)", [
-      blog.userId,
-      blog.title,
-      blog.content,
-    ])
+    .query(
+      "INSERT INTO blog_posts (userId, title, content) " + "VALUES (?, ?, ?)",
+      [blog.userId, blog.title, blog.content]
+    )
     .then(([result]) => {
       return { ...blog, blogId: result.insertId };
     });
@@ -63,7 +62,7 @@ export async function create(blog) {
 export async function update(blog) {
   return db
     .query(
-      "UPDATE users SET blog_posts = ?, title = ?, content = ? WHERE blogId = ?",
+      "UPDATE blog_posts SET blog_posts = ?, title = ?, content = ? WHERE blogId = ?",
       [blog.userId, blog.title, blog.content, blog.blogId]
     )
     .then(([result]) => {

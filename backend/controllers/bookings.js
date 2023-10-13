@@ -1,27 +1,102 @@
 import { Router } from "express";
 import * as Bookings from "../models/bookings.js";
+import auth from "../middleware/auth.js";
 
 const bookingController = Router();
 
-bookingController.get("/:id", (req, res) => {
-  res.status(501).json({
-    status: 501,
-    message: "Get booking by user ID not yet implemented",
-  });
+bookingController.get("/:id", auth(["admin"]), async (req, res) => {
+  const bookingId = req.params.id;
+
+  try {
+    const booking = await getByID(bookingId);
+
+    if (!booking) {
+      res.status(404).json({
+        status: 404,
+        message: "Booking not found",
+      });
+    } else {
+      res.status(200).json({
+        status: 200,
+        message: "Get booking by ID",
+        booking: booking,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Failed to get booking by ID",
+    });
+  }
 });
 
-bookingController.post("/create", (req, res) => {
-  res.status(501).json({
-    status: 501,
-    message: "Create booking not yet implemented",
-  });
+bookingController.get(
+  "/user/:id",
+  auth(["admin", "user"]),
+  async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+      const bookings = await getByUserID(userId);
+
+      if (!bookings) {
+        res.status(404).json({
+          status: 404,
+          message: "Booking not found",
+        });
+      } else {
+        res.status(200).json({
+          status: 200,
+          message: "Get bookings by user ID",
+          bookings: bookings,
+        });
+      }
+    } catch (error) {
+      res.status(500).json({
+        status: 500,
+        message: "Failed to get bookings by user ID",
+      });
+    }
+  }
+);
+
+bookingController.post("/create", auth(["admin", "user"]), async (req, res) => {
+  const { userId, classId } = req.body;
+
+  const booking = Bookings(null, userId, classId);
+  console.log(booking);
+  try {
+    const result = await create(booking);
+    res.status(200).json({
+      status: 200,
+      message: "Created booking",
+      user: result,
+    });
+  } catch (error) {
+    console.error("Database error:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Failed to create booking",
+    });
+  }
 });
 
-bookingController.post("/delete", (req, res) => {
-  res.status(501).json({
-    status: 501,
-    message: "Delete booking not yet implemented",
-  });
+bookingController.post("/delete", auth(["admin", "user"]), (req, res) => {
+  const bookingId = req.params.id;
+
+  deleteById(bookingId)
+    .then((result) => {
+      res.status(200).json({
+        status: 200,
+        message: "booking deleted",
+      });
+    })
+    .catch((error) => {
+      res.status(500).json({
+        status: 500,
+        message: "Failed to delete booking",
+      });
+    });
 });
 
 export default bookingController;
