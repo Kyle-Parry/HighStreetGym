@@ -24,7 +24,8 @@ export async function getByID(userId) {
       INNER JOIN
           location l ON c.locationId = l.locationId
       WHERE
-          b.userId = ?;
+          b.userId = ?
+      ORDER BY c.classDateTime;
     `;
 
   try {
@@ -51,6 +52,6 @@ export async function create(booking) {
     });
 }
 
-export async function deleteById(blogId) {
+export async function deleteById(bookingId) {
   return db.query("DELETE FROM bookings WHERE bookingId = ?", bookingId);
 }

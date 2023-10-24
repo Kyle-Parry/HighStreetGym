@@ -9,9 +9,10 @@ import Link from "@mui/material/Link";
 import React, { useState, useContext } from "react"; // Make sure you import React
 import { useNavigate } from "react-router-dom";
 import { AuthenticationContext } from "../hooks/auth";
+import { useAuthentication } from "../hooks/auth";
 
 const LoginPage = () => {
-  const { login } = useContext(AuthenticationContext); // Access the login function
+  const [authenticatedUser, login, logout] = useAuthentication();
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -20,13 +21,13 @@ const LoginPage = () => {
     // Retrieve the email and password from your form input fields
     const email = e.target.email.value;
     const password = e.target.password.value;
-
+    console.log(email, password);
     try {
       // Call the login function from your authentication context to log in the user
       await login(email, password);
 
       // If login is successful, you can redirect the user to another page
-      navigate("/dashboard"); // Make sure you have 'navigate' from 'react-router-dom' available
+      navigate("/Timetable"); // Make sure you have 'navigate' from 'react-router-dom' available
     } catch (error) {
       console.error("Login failed:", error);
       // Handle login error, such as displaying an error message
@@ -44,7 +45,7 @@ const LoginPage = () => {
             display: "flex",
             bgcolor: "#cfe8fc",
             minHeight: "85vh",
-            mt: "10%",
+            mt: "20%",
             borderRadius: "25px",
             flexDirection: "column",
             alignItems: "center",

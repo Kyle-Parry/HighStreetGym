@@ -25,6 +25,7 @@ classController.get("/", auth(["admin", "user"]), async (req, res) => {
     res.status(500).json({
       status: 500,
       message: "Failed to get classes",
+      error: error.message,
     });
   }
 });

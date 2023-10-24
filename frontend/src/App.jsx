@@ -9,10 +9,12 @@ import ImportBlogPage from "./components/ImportBlog";
 import { RestrictedRoute } from "./components/RestrictedRoute";
 import BookingPage from "./components/BookingPage";
 import BlogPage from "./components/BlogPage";
+import Header from "./components/Header";
 
 function App() {
   return (
     <div>
+      <Header />
       <BottomNavbar />
       <Routes>
         <Route path="/" element={<LoginPage />} />
@@ -54,7 +56,7 @@ function App() {
         <Route
           path="/ImportClass"
           element={
-            <RestrictedRoute allowedRoles={["admin", "user"]}>
+            <RestrictedRoute allowedRoles={["admin"]}>
               <ImportClassPage />
             </RestrictedRoute>
           }
@@ -62,7 +64,7 @@ function App() {
         <Route
           path="/ImportBlog"
           element={
-            <RestrictedRoute allowedRoles={["admin", "user"]}>
+            <RestrictedRoute allowedRoles={["admin"]}>
               <ImportBlogPage />
             </RestrictedRoute>
           }

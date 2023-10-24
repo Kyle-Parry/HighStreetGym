@@ -31,7 +31,7 @@ blogController.get("/", auth(["admin", "user"]), async (req, res) => {
   } catch (error) {
     res.status(500).json({
       status: 500,
-      message: "Failed to get blog posts",
+      message: "Failed to get blog posts" + error,
     });
   }
 });

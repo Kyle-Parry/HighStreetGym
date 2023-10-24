@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as Bookings from "../models/bookings.js";
+import { Bookings, getByID, create, deleteById } from "../models/bookings.js";
 import auth from "../middleware/auth.js";
 
 const bookingController = Router();
@@ -81,7 +81,7 @@ bookingController.post("/create", auth(["admin", "user"]), async (req, res) => {
   }
 });
 
-bookingController.post("/delete", auth(["admin", "user"]), (req, res) => {
+bookingController.post("/delete/:id", auth(["admin", "user"]), (req, res) => {
   const bookingId = req.params.id;
 
   deleteById(bookingId)
@@ -94,7 +94,7 @@ bookingController.post("/delete", auth(["admin", "user"]), (req, res) => {
     .catch((error) => {
       res.status(500).json({
         status: 500,
-        message: "Failed to delete booking",
+        message: "Failed to delete booking" + error,
       });
     });
 });

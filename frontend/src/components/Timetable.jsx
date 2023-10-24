@@ -1,97 +1,148 @@
+import { useState, useEffect } from "react";
+import Axios from "axios";
+import { useAuthentication } from "../hooks/auth.jsx";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Grid } from "@mui/material";
+
 export default function Timetable() {
-  const gymClasses = [
-    { id: 1, title: "Yoga", date: "2023-07-31", trainer: "jim", time: "10am" },
-    {
-      id: 2,
-      title: "Pilates",
-      date: "2023-07-31",
-      trainer: "jim",
-      time: "10am",
-    },
-    { id: 3, title: "Zumba", date: "2023-08-01", trainer: "jim", time: "10am" },
-    {
-      id: 4,
-      title: "Spinning",
-      date: "2023-08-01",
-      trainer: "jim",
-      time: "10am",
-    },
-  ];
+  const [gymClasses, setGymClasses] = useState([]);
+  const [authenticatedUser] = useAuthentication();
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await Axios.get("http://localhost:8080/classes");
+        if (response.data.status === 200) {
+          setGymClasses(response.data.gymClasses);
+        }
+      } catch (error) {
+        console.error("Error fetching gym classes:", error);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   const groupedClasses = gymClasses.reduce((acc, gymClass) => {
-    const { date } = gymClass;
-    const dateObj = new Date(date);
-    const dayOfWeek = dateObj.toLocaleDateString(undefined, {
+    const date = new Date(gymClass.classDateTime);
+    const formattedDate = `${date.toLocaleString("en-GB", {
       weekday: "long",
-    });
-    const formattedDate = dateObj.toLocaleDateString(undefined, {
-      day: "numeric",
+    })} ${date.getDate()} ${date.toLocaleString("en-GB", {
       month: "long",
-      year: "numeric",
-    });
-
-    acc[dayOfWeek] = acc[dayOfWeek] || { classes: [], formattedDate };
-    acc[dayOfWeek].classes.push(gymClass);
+    })} ${date.getFullYear()}`;
+    if (!acc[formattedDate]) {
+      acc[formattedDate] = [];
+    }
+    acc[formattedDate].push(gymClass);
     return acc;
   }, {});
 
+  async function handleBooking(classId) {
+    if (!authenticatedUser) {
+      alert("Please log in to book a class.");
+      return;
+    }
+
+    const userId = authenticatedUser.userId;
+
+    try {
+      const response = await Axios.post(
+        "http://localhost:8080/bookings/create",
+        {
+          userId: userId,
+          classId: classId,
+        }
+      );
+
+      if (response.data.status === 200) {
+        alert("Booking created successfully!");
+      } else {
+        alert("Failed to book the class.");
+      }
+    } catch (error) {
+      console.error("Error creating booking:", error);
+      alert("Failed to book the class.");
+    }
+  }
+
   return (
-    <div>
-      {Object.entries(groupedClasses).map(
-        ([day, { classes, formattedDate }]) => (
-          <Paper key={day} sx={{ p: 2, my: 2 }}>
-            <Typography variant="h5">
-              {day} {formattedDate}
-            </Typography>
-            <Divider />
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                minHeight: "50px",
-                textAlign: "center",
-              }}
-            >
-              <Typography sx={{ fontWeight: "bold", width: "80px" }}>
+    <Box
+      component="div"
+      sx={{
+        backgroundColor: "#cfe8fc",
+        p: 3,
+        minHeight: "100vh",
+        borderRadius: "25px",
+        mt: "20%",
+        mb: "20%",
+      }}
+    >
+      <Typography variant="h4" sx={{ mb: 4, mt: 3, textAlign: "center" }}>
+        Timetable
+      </Typography>
+      {Object.entries(groupedClasses).map(([formattedDate, classesForDate]) => (
+        <Paper
+          key={formattedDate}
+          sx={{ p: 3, my: 2, backgroundColor: "white" }}
+        >
+          <Typography variant="h5" sx={{ mb: 3 }}>
+            {formattedDate}
+          </Typography>
+          <Divider sx={{ mb: 3 }} />
+          <Grid container spacing={2} sx={{ my: 2 }}>
+            <Grid item xs={3}>
+              <Typography sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Class
               </Typography>
-              <Typography sx={{ fontWeight: "bold", width: "80px" }}>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Trainer
               </Typography>
-              <Typography sx={{ fontWeight: "bold", width: "80px" }}>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Time
               </Typography>
-              <Typography sx={{ fontWeight: "bold", width: "80px" }}>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography sx={{ fontWeight: "bold", textAlign: "center" }}>
                 Book Class
               </Typography>
-            </Box>
-            {classes.map((gymClass) => (
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  minHeight: "50px",
-                  textAlign: "center",
-                }}
-                key={gymClass.id}
-              >
-                <Typography sx={{ width: "80px" }}>{gymClass.title}</Typography>
-                <Typography sx={{ width: "80px" }}>
-                  {gymClass.trainer}
+            </Grid>
+          </Grid>
+          {classesForDate.map((gymClass) => (
+            <Grid
+              container
+              spacing={2}
+              key={gymClass.classId}
+              sx={{ textAlign: "center", my: 1 }}
+            >
+              <Grid item xs={3}>
+                <Typography>{gymClass.activityName}</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography>
+                  {gymClass.firstName} {gymClass.lastName}
                 </Typography>
-                <Typography sx={{ width: "80px" }}>{gymClass.time}</Typography>
-                <Button sx={{ width: "80px" }}>Book</Button>
-              </Box>
-            ))}
-          </Paper>
-        )
-      )}
-    </div>
+              </Grid>
+              <Grid item xs={3}>
+                <Typography>{gymClass.activityDur}</Typography>
+              </Grid>
+              <Grid item xs={3}>
+                <Button
+                  variant="outlined"
+                  onClick={() => handleBooking(gymClass.classId)}
+                >
+                  Book
+                </Button>
+              </Grid>
+            </Grid>
+          ))}
+        </Paper>
+      ))}
+    </Box>
   );
 }

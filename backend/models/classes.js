@@ -3,6 +3,7 @@ import { db } from "../database/database.js";
 export function Classes(classId, locationId, activityId, userId) {
   return {
     classId,
+    classDateTime,
     locationId,
     activityId,
     userId,
@@ -13,6 +14,7 @@ export async function getAll() {
   const query = `
       SELECT
           c.classId,
+          c.classDateTime,
           a.activityName,
           a.activityDur,
           l.locationName,
@@ -25,7 +27,9 @@ export async function getAll() {
       INNER JOIN
           location l ON c.locationId = l.locationId
       INNER JOIN
-          classes u ON c.userId = u.userId;
+          users u ON c.userId = u.userId;
+    
+
     `;
 
   try {
@@ -44,9 +48,14 @@ export async function getAll() {
 export async function create(gymClass) {
   return db
     .query(
-      "INSERT INTO classes (locationId, activityId, userId) " +
+      "INSERT INTO classes (classDateTime, locationId, activityId, userId) " +
         "VALUES (?, ?, ?)",
-      [gymClass.locationId, gymClass.activityId, gymClass.userId]
+      [
+        gymClass.classDateTime,
+        gymClass.locationId,
+        gymClass.activityId,
+        gymClass.userId,
+      ]
     )
     .then(([result]) => {
       return { ...gymClass, classId: result.insertId };
@@ -59,13 +68,14 @@ export async function update(gymClass) {
       "UPDATE classes SET locationId = ?, activityId = ?, userId = ? WHERE classId = ?",
       [
         gymClass.classId,
+        gymClass.classDateTime,
         gymClass.locationId,
         gymClass.activityId,
         gymClass.userId,
       ]
     )
     .then(([result]) => {
-      return { ...blog, blogId: result.insertId };
+      return { ...gymClass, classId: result.insertId };
     });
 }
 

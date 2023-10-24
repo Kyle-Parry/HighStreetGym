@@ -27,7 +27,7 @@ const ProfilePage = () => {
             display: "flex",
             bgcolor: "#cfe8fc",
             minHeight: "85vh",
-            mt: "20px",
+            mt: "20%",
             mb: "70px",
             borderRadius: "25px",
             flexDirection: "column",

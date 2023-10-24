@@ -51,7 +51,7 @@ export function useAuthentication() {
         password,
       });
       if (response.status === 200) {
-        localStorage.setItem("authKey", response.data.authKey);
+        axios.defaults.headers.common["X-AUTH-KEY"] = response.data.authKey;
         // Fetch the logged-in user from the backend using the full URL
         const userResponse = await axios.get(
           `http://localhost:8080/users/key/${response.data.authKey}`
@@ -75,7 +75,7 @@ export function useAuthentication() {
           authKey: authKey,
         });
         setAuthenticatedUser(null);
-        localStorage.removeItem("authKey");
+        delete axios.defaults.headers.common["X-AUTH-KEY"];
         return "User logged out";
       } catch (error) {
         return Promise.reject(error);

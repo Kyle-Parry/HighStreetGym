@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Box from "@mui/material/Box";
 import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
@@ -10,14 +10,21 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import LoginIcon from "@mui/icons-material/Login";
 import CommentIcon from "@mui/icons-material/Comment";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useAuthentication } from "../hooks/auth.jsx";
 
 export default function BottomNavbar() {
+  const [authenticatedUser, login, logout] = useAuthentication();
+
   const [value, setValue] = useState(0);
-  const [loggedIn, setLoggedIn] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
   const activePath = location.pathname;
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
 
   return (
     <Box
@@ -44,7 +51,7 @@ export default function BottomNavbar() {
           value="/Timetable"
           icon={<CalendarMonthIcon />}
         />
-        {loggedIn && (
+        {authenticatedUser && (
           <BottomNavigationAction
             label="Bookings"
             value="/Bookings"
@@ -56,7 +63,7 @@ export default function BottomNavbar() {
           value="/Blog"
           icon={<CommentIcon />}
         />
-        {loggedIn && (
+        {authenticatedUser && (
           <BottomNavigationAction
             label="Profile"
             value="/Profile"
@@ -64,9 +71,10 @@ export default function BottomNavbar() {
           />
         )}
         <BottomNavigationAction
-          label={loggedIn ? "Logout" : "Login"}
+          label={authenticatedUser ? "Logout" : "Login"}
           value="/"
-          icon={loggedIn ? <LogoutIcon /> : <LoginIcon />}
+          icon={authenticatedUser ? <LogoutIcon /> : <LoginIcon />}
+          onClick={authenticatedUser ? handleLogout : null}
         />
       </BottomNavigation>
     </Box>

@@ -1,46 +1,72 @@
 import { db } from "../database/database.js";
 
-export function Blogs(blogId, blogDateTime, userId, title, content) {
+export function Blogs(
+  blogId,
+  blogDateTime,
+  userId,
+  title,
+  content,
+  firstName,
+  lastName
+) {
   return {
     blogId,
     blogDateTime,
     userId,
     title,
     content,
+    firstName,
+    lastName,
   };
 }
 
 export async function getAll() {
   const [allBlogPosts] = await db.query(
-    "SELECT * FROM blog_posts ORDER BY blogDateTime DESC"
+    `
+    SELECT blog_posts.*, users.firstName, users.lastName,
+           DATE_FORMAT(blog_posts.blogDateTime, '%d/%m/%Y') AS formattedDate 
+    FROM blog_posts 
+    JOIN users ON blog_posts.userId = users.userId 
+    ORDER BY blog_posts.blogDateTime DESC
+    `
   );
 
   return allBlogPosts.map((blogPost) =>
     Blogs(
       blogPost.blogId,
-      blogPost.blogDateTime,
+      blogPost.formattedDate,
       blogPost.userId,
       blogPost.title,
-      blogPost.content
+      blogPost.content,
+      blogPost.firstName,
+      blogPost.lastName
     )
   );
 }
 
 export async function getByID(blogId) {
   const [allBlogPosts] = await db.query(
-    "SELECT * FROM blog_posts WHERE blogId = ?",
+    `
+    SELECT blog_posts.*, users.firstName, users.lastName,
+           DATE_FORMAT(blog_posts.blogDateTime, '%d/%m/%Y') AS formattedDate 
+    FROM blog_posts 
+    JOIN users ON blog_posts.userId = users.userId 
+    WHERE blog_posts.blogId = ?
+    `,
     blogId
   );
 
   if (allBlogPosts.length > 0) {
-    const allBlogPost = allBlogPosts[0];
+    const blogPost = allBlogPosts[0];
     return Promise.resolve(
       Blogs(
-        allBlogPosts.blogId,
-        allBlogPosts.blogDateTime,
-        allBlogPosts.userId,
-        allBlogPosts.title,
-        allBlogPosts.content
+        blogPost.blogId,
+        blogPost.formattedDate,
+        blogPost.userId,
+        blogPost.title,
+        blogPost.content,
+        blogPost.firstName,
+        blogPost.lastName
       )
     );
   } else {

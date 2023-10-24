@@ -86,6 +86,7 @@ export async function getByAuthKey(authKey) {
         userResult.email,
         userResult.password,
         userResult.role,
+        userResult.phone,
         userResult.firstName,
         userResult.lastName,
         userResult.authKey
