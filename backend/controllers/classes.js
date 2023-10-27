@@ -79,7 +79,7 @@ classController.post("/upload/xml", auth(["admin"]), (req, res) => {
               // Convert the xml object into a model object
               const classModel = Class(
                 null,
-                null,
+                classData.classDateTime.toString(),
                 classData.locationId.toString(),
                 classData.activityId.toString(),
                 classData.userId.toString()
@@ -106,7 +106,7 @@ classController.post("/upload/xml", auth(["admin"]), (req, res) => {
               // Convert the xml object into a model object
               const classModel = Users(
                 classData.classId.toString(),
-                null,
+                classData.classDateTime.toString(),
                 classData.locationId.toString(),
                 classData.activityId.toString(),
                 classData.userId.toString()

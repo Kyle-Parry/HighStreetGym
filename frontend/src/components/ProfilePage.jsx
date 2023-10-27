@@ -1,21 +1,78 @@
 /* eslint-disable no-unused-vars */
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useAuthentication } from "../hooks/auth.jsx";
+import axios from "axios";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import Link from "@mui/material/Link";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
 
 const ProfilePage = () => {
-  const updateProfile = async (e) => {
+  const [authenticatedUser, ,] = useAuthentication();
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    address: "",
+    addressTwo: "",
+    state: "",
+    postCode: "",
+    userId: authenticatedUser.userId,
+  });
+
+  function handleInputChange(event) {
+    const { name, value } = event.target;
+    setFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value,
+    }));
+  }
+
+  useEffect(() => {
+    if (authenticatedUser) {
+      setFormData({
+        email: authenticatedUser.email || "",
+        password: "",
+        firstName: authenticatedUser.firstName || "",
+        lastName: authenticatedUser.lastName || "",
+        phone: authenticatedUser.phone || "",
+        address: authenticatedUser.address || "",
+        addressTwo: authenticatedUser.addressTwo || "",
+        state: authenticatedUser.state || "",
+        postCode: authenticatedUser.postCode || "",
+        userId: authenticatedUser.userId,
+      });
+    }
+  }, [authenticatedUser]);
+
+  async function updateProfile(e) {
     e.preventDefault();
-  };
+    console.log("Sending payload:", formData);
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/users/profile",
+        formData
+      );
+
+      if (response.data.status === 200) {
+        alert("Profile updated successfully!");
+      } else {
+        alert("Failed to update the profile.");
+      }
+    } catch (error) {
+      console.error("An error occurred while updating the profile:", error);
+      alert("Failed to update the profile.");
+    }
+  }
+
   return (
     <>
       <CssBaseline />
@@ -51,65 +108,67 @@ const ProfilePage = () => {
 
           <TextField
             required
+            name="email"
             id="email"
             label="Email"
             type="email"
+            value={formData.email}
+            onChange={handleInputChange}
             sx={{ bgcolor: "#fff", marginTop: "30px", borderRadius: "5px" }}
           />
           <TextField
             required
+            name="password"
             id="password"
             label="Password"
             type="password"
+            value={formData.password}
+            onChange={handleInputChange}
             sx={{ bgcolor: "#fff", marginTop: "30px", borderRadius: "5px" }}
           />
           <TextField
             required
-            id="confirm-password"
-            label="Confirm Password"
-            type="password"
-            sx={{ bgcolor: "#fff", marginTop: "30px", borderRadius: "5px" }}
-          />
-          <TextField
-            required
+            name="firstName"
             id="firstName"
             label="First Name"
+            value={formData.firstName}
+            onChange={handleInputChange}
             sx={{ bgcolor: "#fff", marginTop: "30px", borderRadius: "5px" }}
           />
           <TextField
             required
+            name="lastName"
             id="lastName"
             label="Last Name"
+            value={formData.lastName}
+            onChange={handleInputChange}
             sx={{ bgcolor: "#fff", marginTop: "30px", borderRadius: "5px" }}
           />
           <TextField
             required
+            name="phone"
             id="phone"
             label="Phone"
             type="number"
-            sx={{
-              bgcolor: "#fff",
-              marginTop: "30px",
-              borderRadius: "5px",
-              "input::-webkit-outer-spin-button, input::-webkit-inner-spin-button":
-                {
-                  WebkitAppearance: "none",
-                  margin: 0,
-                },
-              "input[type=number]": {
-                MozAppearance: "textfield",
-              },
-            }}
-          />
-          <TextField
-            required
-            id="address"
-            label="Address Line 1"
+            value={formData.phone}
+            onChange={handleInputChange}
             sx={{ bgcolor: "#fff", marginTop: "30px", borderRadius: "5px" }}
           />
           <TextField
-            id="address-line-two"
+            required
+            name="address"
+            id="address"
+            label="Address Line 1"
+            value={formData.address}
+            onChange={handleInputChange}
+            sx={{ bgcolor: "#fff", marginTop: "30px", borderRadius: "5px" }}
+          />
+          <TextField
+            name="addressTwo"
+            id="addressTwo"
             label="Address Line 2"
+            value={formData.addressTwo}
+            onChange={handleInputChange}
             sx={{ bgcolor: "#fff", marginTop: "30px", borderRadius: "5px" }}
           />
           <FormControl
@@ -122,7 +181,15 @@ const ProfilePage = () => {
             }}
           >
             <InputLabel id="state-label">State</InputLabel>
-            <Select id="state" label="State" labelId="state-label">
+            <Select
+              name="state"
+              id="state"
+              label="State"
+              labelId="state-label"
+              value={formData.state}
+              onChange={handleInputChange}
+            >
+              <MenuItem value="">Select a State</MenuItem>
               <MenuItem value="QLD">QLD</MenuItem>
               <MenuItem value="NSW">NSW</MenuItem>
               <MenuItem value="VIC">VIC</MenuItem>
@@ -134,33 +201,14 @@ const ProfilePage = () => {
           </FormControl>
           <TextField
             required
-            id="post-code"
+            name="postCode"
+            id="postCode"
             label="Post Code"
             type="number"
-            sx={{
-              bgcolor: "#fff",
-              marginTop: "30px",
-              borderRadius: "5px",
-              "input::-webkit-outer-spin-button, input::-webkit-inner-spin-button":
-                {
-                  WebkitAppearance: "none",
-                  margin: 0,
-                },
-              "input[type=number]": {
-                MozAppearance: "textfield",
-              },
-            }}
+            value={formData.postCode}
+            onChange={handleInputChange}
+            sx={{ bgcolor: "#fff", marginTop: "30px", borderRadius: "5px" }}
           />
-          <Typography
-            variant="p"
-            component="div"
-            gutterBottom
-            sx={{
-              textAlign: "center",
-
-              color: "red",
-            }}
-          ></Typography>
           <Button type="submit" variant="contained" sx={{ marginTop: "30px" }}>
             Save
           </Button>

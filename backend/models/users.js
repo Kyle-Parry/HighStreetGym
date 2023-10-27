@@ -8,6 +8,10 @@ export function Users(
   phone,
   firstName,
   lastName,
+  address,
+  addressTwo,
+  state,
+  postCode,
   authKey
 ) {
   return {
@@ -18,6 +22,10 @@ export function Users(
     phone,
     firstName,
     lastName,
+    address,
+    addressTwo,
+    state,
+    postCode,
     authKey,
   };
 }
@@ -39,6 +47,10 @@ export async function getByID(userId) {
         userResult.phone,
         userResult.firstName,
         userResult.lastName,
+        userResult.address,
+        userResult.addressTwo,
+        userResult.state,
+        userResult.postCode,
         userResult.authKey
       )
     );
@@ -56,15 +68,18 @@ export async function getByEmail(email) {
   if (userResults.length > 0) {
     const userResult = userResults[0];
 
-    // Use the "new" keyword to create a new user object
     return new Users(
       userResult.userId,
       userResult.email,
-      userResult.password, // Make sure 'password' is assigned correctly
+      userResult.password,
       userResult.role,
       userResult.phone,
       userResult.firstName,
       userResult.lastName,
+      userResult.address,
+      userResult.addressTwo,
+      userResult.state,
+      userResult.postCode,
       userResult.authKey
     );
   } else {
@@ -89,6 +104,10 @@ export async function getByAuthKey(authKey) {
         userResult.phone,
         userResult.firstName,
         userResult.lastName,
+        userResult.address,
+        userResult.addressTwo,
+        userResult.state,
+        userResult.postCode,
         userResult.authKey
       )
     );
@@ -100,8 +119,8 @@ export async function getByAuthKey(authKey) {
 export async function create(user) {
   return db
     .query(
-      "INSERT INTO users (email, password, role, phone, firstName, lastName) " +
-        "VALUES (?, ?, ?, ?, ?, ?)",
+      "INSERT INTO users (email, password, role, phone, firstName, lastName, address, addressTwo, state, postCode) " +
+        "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
       [
         user.email,
         user.password,
@@ -109,6 +128,10 @@ export async function create(user) {
         user.phone,
         user.firstName,
         user.lastName,
+        user.address,
+        user.addressTwo,
+        user.state,
+        user.postCode,
       ]
     )
     .then(([result]) => {
@@ -119,7 +142,7 @@ export async function create(user) {
 export async function update(user) {
   return db
     .query(
-      "UPDATE users SET email = ?, password = ?, role = ?, phone = ?, firstName = ?, lastName = ? WHERE userId = ?",
+      "UPDATE users SET email = ?, password = ?, role = ?, phone = ?, firstName = ?, lastName = ?, address = ?, addressTwo = ?, state = ?, postCode = ? WHERE userId = ?",
       [
         user.email,
         user.password,
@@ -127,6 +150,10 @@ export async function update(user) {
         user.phone,
         user.firstName,
         user.lastName,
+        user.address,
+        user.addressTwo,
+        user.state,
+        user.postCode,
         user.userId,
       ]
     )

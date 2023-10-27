@@ -239,7 +239,19 @@ userController.post("/register", async (req, res) => {
 });
 
 userController.post("/profile", auth(["admin", "user"]), async (req, res) => {
-  const { email, password, phone, firstName, lastName } = req.body;
+  const {
+    userId,
+    email,
+    password,
+    phone,
+    firstName,
+    lastName,
+    address,
+    addressTwo,
+    state,
+    postCode,
+  } = req.body;
+  console.log(req.body);
 
   let hashedPassword = password;
   if (!password.startsWith("$2a")) {
@@ -247,13 +259,17 @@ userController.post("/profile", auth(["admin", "user"]), async (req, res) => {
   }
 
   const user = Users(
-    null,
+    userId,
     email,
     hashedPassword,
     null,
     phone,
     firstName,
     lastName,
+    address,
+    addressTwo,
+    state,
+    postCode,
     null
   );
 

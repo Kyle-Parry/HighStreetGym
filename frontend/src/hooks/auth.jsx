@@ -8,10 +8,14 @@ export const AuthenticationContext = createContext(null);
 export function AuthenticationProvider({ router, children }) {
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
   const navigate = useNavigate();
+
   useEffect(() => {
     if (authenticatedUser == null) {
       const authKey = localStorage.getItem("authKey");
       if (authKey) {
+        // Set the header for Axios
+        axios.defaults.headers.common["X-AUTH-KEY"] = authKey;
+
         // Fetch the logged-in user from the backend using the full URL
         axios
           .get(`http://localhost:8080/users/key/${authKey}`)
@@ -51,8 +55,9 @@ export function useAuthentication() {
         password,
       });
       if (response.status === 200) {
+        // Save the authKey to localStorage
+        localStorage.setItem("authKey", response.data.authKey);
         axios.defaults.headers.common["X-AUTH-KEY"] = response.data.authKey;
-        // Fetch the logged-in user from the backend using the full URL
         const userResponse = await axios.get(
           `http://localhost:8080/users/key/${response.data.authKey}`
         );
@@ -75,6 +80,7 @@ export function useAuthentication() {
           authKey: authKey,
         });
         setAuthenticatedUser(null);
+        localStorage.removeItem("authKey");
         delete axios.defaults.headers.common["X-AUTH-KEY"];
         return "User logged out";
       } catch (error) {

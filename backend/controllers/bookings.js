@@ -4,11 +4,11 @@ import auth from "../middleware/auth.js";
 
 const bookingController = Router();
 
-bookingController.get("/:id", auth(["admin"]), async (req, res) => {
-  const bookingId = req.params.id;
+bookingController.get("/:id", auth(["admin", "user"]), async (req, res) => {
+  const userId = req.params.id;
 
   try {
-    const booking = await getByID(bookingId);
+    const booking = await getByID(userId);
 
     if (!booking) {
       res.status(404).json({
@@ -29,36 +29,6 @@ bookingController.get("/:id", auth(["admin"]), async (req, res) => {
     });
   }
 });
-
-bookingController.get(
-  "/user/:id",
-  auth(["admin", "user"]),
-  async (req, res) => {
-    const userId = req.params.id;
-
-    try {
-      const bookings = await getByUserID(userId);
-
-      if (!bookings) {
-        res.status(404).json({
-          status: 404,
-          message: "Booking not found",
-        });
-      } else {
-        res.status(200).json({
-          status: 200,
-          message: "Get bookings by user ID",
-          bookings: bookings,
-        });
-      }
-    } catch (error) {
-      res.status(500).json({
-        status: 500,
-        message: "Failed to get bookings by user ID",
-      });
-    }
-  }
-);
 
 bookingController.post("/create", auth(["admin", "user"]), async (req, res) => {
   const { userId, classId } = req.body;
