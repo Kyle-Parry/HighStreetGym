@@ -4,7 +4,7 @@ import { useAuthentication } from "../hooks/auth.jsx";
 import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import { Box, Button, Grid } from "@mui/material";
+import { Box, Button } from "@mui/material";
 
 export default function Timetable() {
   const [gymClasses, setGymClasses] = useState([]);
@@ -27,15 +27,24 @@ export default function Timetable() {
 
   const groupedClasses = gymClasses.reduce((acc, gymClass) => {
     const date = new Date(gymClass.classDateTime);
+    const time = date.toLocaleString("en-GB", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
     const formattedDate = `${date.toLocaleString("en-GB", {
       weekday: "long",
     })} ${date.getDate()} ${date.toLocaleString("en-GB", {
       month: "long",
     })} ${date.getFullYear()}`;
+
     if (!acc[formattedDate]) {
       acc[formattedDate] = [];
     }
-    acc[formattedDate].push(gymClass);
+    acc[formattedDate].push({
+      gymClass: gymClass,
+      time: time,
+    });
     return acc;
   }, {});
 
@@ -91,55 +100,45 @@ export default function Timetable() {
             {formattedDate}
           </Typography>
           <Divider sx={{ mb: 3 }} />
-          <Grid container spacing={2} sx={{ my: 2 }}>
-            <Grid item xs={3}>
-              <Typography sx={{ fontWeight: "bold", textAlign: "center" }}>
-                Class
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography sx={{ fontWeight: "bold", textAlign: "center" }}>
-                Trainer
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography sx={{ fontWeight: "bold", textAlign: "center" }}>
-                Time
-              </Typography>
-            </Grid>
-            <Grid item xs={3}>
-              <Typography sx={{ fontWeight: "bold", textAlign: "center" }}>
-                Book Class
-              </Typography>
-            </Grid>
-          </Grid>
-          {classesForDate.map((gymClass) => (
-            <Grid
-              container
-              spacing={2}
+          {classesForDate.map(({ gymClass, time }) => (
+            <Box
               key={gymClass.classId}
-              sx={{ textAlign: "center", my: 1 }}
+              sx={{ mb: 3, display: "flex", flexWrap: "wrap" }}
             >
-              <Grid item xs={3}>
+              <Box
+                sx={{ flex: "1 0 auto", minWidth: "fit-content", mr: 2, mb: 1 }}
+              >
+                <Typography variant="caption">Class</Typography>
                 <Typography>{gymClass.activityName}</Typography>
-              </Grid>
-              <Grid item xs={3}>
+              </Box>
+              <Box
+                sx={{ flex: "1 0 auto", minWidth: "fit-content", mr: 2, mb: 1 }}
+              >
+                <Typography variant="caption">Trainer</Typography>
                 <Typography>
                   {gymClass.firstName} {gymClass.lastName}
                 </Typography>
-              </Grid>
-              <Grid item xs={3}>
+              </Box>
+              <Box
+                sx={{ flex: "1 0 auto", minWidth: "fit-content", mr: 2, mb: 1 }}
+              >
+                <Typography variant="caption">Time</Typography>
+                <Typography>{time}</Typography>
+              </Box>
+              <Box
+                sx={{ flex: "1 0 auto", minWidth: "fit-content", mr: 2, mb: 1 }}
+              >
+                <Typography variant="caption">Duration</Typography>
                 <Typography>{gymClass.activityDur}</Typography>
-              </Grid>
-              <Grid item xs={3}>
-                <Button
-                  variant="outlined"
-                  onClick={() => handleBooking(gymClass.classId)}
-                >
-                  Book
-                </Button>
-              </Grid>
-            </Grid>
+              </Box>
+              <Button
+                variant="outlined"
+                onClick={() => handleBooking(gymClass.classId)}
+                sx={{ flex: "1 0 auto", minWidth: "fit-content", mt: 1 }}
+              >
+                Book
+              </Button>
+            </Box>
           ))}
         </Paper>
       ))}

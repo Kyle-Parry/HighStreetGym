@@ -38,7 +38,6 @@ export default function BottomNavbar() {
     >
       <BottomNavigation
         sx={{ position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 2 }}
-        elevation={3}
         showLabels
         value={activePath}
         onChange={(event, newValue) => {

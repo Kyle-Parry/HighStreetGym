@@ -31,7 +31,7 @@ const ImportBlogPage = (onUploadSuccess) => {
       .then((APIResponse) => {
         setStatusMessage(APIResponse.message);
         // clear the selected file
-        file.current.value = null;
+        file.current.value = "";
         // Notify of successful upload
         if (typeof onUploadSuccess === "function") {
           onUploadSuccess();

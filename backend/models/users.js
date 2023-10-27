@@ -142,11 +142,10 @@ export async function create(user) {
 export async function update(user) {
   return db
     .query(
-      "UPDATE users SET email = ?, password = ?, role = ?, phone = ?, firstName = ?, lastName = ?, address = ?, addressTwo = ?, state = ?, postCode = ? WHERE userId = ?",
+      "UPDATE users SET email = ?, password = ?, phone = ?, firstName = ?, lastName = ?, address = ?, addressTwo = ?, state = ?, postCode = ? WHERE userId = ?",
       [
         user.email,
         user.password,
-        user.role,
         user.phone,
         user.firstName,
         user.lastName,
