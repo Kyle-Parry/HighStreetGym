@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { getAll, create, update, deleteById } from "../models/classes.js";
+import {
+  Classes,
+  getAll,
+  create,
+  update,
+  deleteById,
+} from "../models/classes.js";
 import xml2js from "xml2js";
 import auth from "../middleware/auth.js";
 
@@ -71,13 +77,13 @@ classController.post("/upload/xml", auth(["admin"]), (req, res) => {
         const classUploadAttributes = classUpload["$"];
         const operation = classUploadAttributes["operation"];
         // Slightly painful indexing to reach nested children
-        const classData = classUpload["classs"][0]["class"];
+        const classData = classUpload["classes"][0]["class"];
 
         if (operation == "insert") {
           Promise.all(
             classData.map((classData) => {
               // Convert the xml object into a model object
-              const classModel = Class(
+              const classModel = Classes(
                 null,
                 classData.classDateTime.toString(),
                 classData.locationId.toString(),
@@ -104,7 +110,7 @@ classController.post("/upload/xml", auth(["admin"]), (req, res) => {
           Promise.all(
             classData.map((classData) => {
               // Convert the xml object into a model object
-              const classModel = Users(
+              const classModel = Classes(
                 classData.classId.toString(),
                 classData.classDateTime.toString(),
                 classData.locationId.toString(),

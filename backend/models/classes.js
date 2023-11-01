@@ -1,6 +1,12 @@
 import { db } from "../database/database.js";
 
-export function Classes(classId, locationId, activityId, userId) {
+export function Classes(
+  classId,
+  classDateTime,
+  locationId,
+  activityId,
+  userId
+) {
   return {
     classId,
     classDateTime,
@@ -49,7 +55,7 @@ export async function create(gymClass) {
   return db
     .query(
       "INSERT INTO classes (classDateTime, locationId, activityId, userId) " +
-        "VALUES (?, ?, ?)",
+        "VALUES (?, ?, ?, ?)",
       [
         gymClass.classDateTime,
         gymClass.locationId,

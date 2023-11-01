@@ -35,7 +35,7 @@ export default function Bookings() {
 
       if (response.data.status === 200) {
         alert("Booking cancelled successfully!");
-        setBookings(bookings.filter((b) => b.bookingId !== bookingId)); // remove the cancelled booking from state
+        setBookings(bookings.filter((b) => b.bookingId !== bookingId));
       } else {
         alert("Failed to cancel the booking.");
       }

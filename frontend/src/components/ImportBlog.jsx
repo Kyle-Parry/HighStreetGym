@@ -1,5 +1,6 @@
 /* eslint-disable no-unused-vars */
 import { useState, useRef } from "react";
+import { useAuthentication } from "../hooks/auth.jsx";
 import CssBaseline from "@mui/material/CssBaseline";
 import Box from "@mui/material/Box";
 import Container from "@mui/material/Container";
@@ -11,28 +12,28 @@ import Link from "@mui/material/Link";
 const ImportBlogPage = (onUploadSuccess) => {
   const fileRef = useRef(null);
   const [statusMessage, setStatusMessage] = useState("");
+  const [authenticatedUser] = useAuthentication();
   const importBlog = async (e) => {
     e.preventDefault();
 
-    // Files is an array because the user could select multiple files
-    // we choose to upload only the first selected file in this case.
     const file = fileRef.current.files[0];
 
-    // Fetch expects multi-part form data to be provided
-    // inside a FormData object.
     const formData = new FormData();
     formData.append("xml-file", file);
 
     fetch("http://localhost:8080/blog/upload/xml", {
       method: "POST",
       body: formData,
+      headers: {
+        "X-AUTH-KEY": authenticatedUser.authKey,
+      },
     })
       .then((res) => res.json())
       .then((APIResponse) => {
         setStatusMessage(APIResponse.message);
-        // clear the selected file
+
         file.current.value = "";
-        // Notify of successful upload
+
         if (typeof onUploadSuccess === "function") {
           onUploadSuccess();
         }
