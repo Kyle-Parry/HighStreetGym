@@ -31,6 +31,7 @@ const ImportBlogPage = (onUploadSuccess) => {
       .then((res) => res.json())
       .then((APIResponse) => {
         setStatusMessage(APIResponse.message);
+        alert("Upload successful: " + APIResponse.message);
 
         file.current.value = "";
 
@@ -40,6 +41,7 @@ const ImportBlogPage = (onUploadSuccess) => {
       })
       .catch((error) => {
         setStatusMessage("Upload failed - " + error);
+        alert("Upload failed: " + error);
       });
   };
 
