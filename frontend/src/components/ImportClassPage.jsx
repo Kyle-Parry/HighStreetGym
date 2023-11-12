@@ -16,11 +16,14 @@ const ImportClassPage = (onUploadSuccess) => {
   const importClass = async (e) => {
     e.preventDefault();
 
-    const file = fileRef.current.files[0];
+    if (!fileRef.current.files.length) {
+      setStatusMessage("No file selected.");
+      return;
+    }
 
+    const file = fileRef.current.files[0];
     const formData = new FormData();
     formData.append("xml-file", file);
-
     fetch("http://localhost:8080/classes/upload/xml", {
       method: "POST",
       body: formData,
@@ -33,15 +36,18 @@ const ImportClassPage = (onUploadSuccess) => {
         setStatusMessage(APIResponse.message);
         alert("Upload successful: " + APIResponse.message);
 
-        file.current.value = "";
+        if (fileRef.current) {
+          fileRef.current.value = "";
+        }
 
         if (typeof onUploadSuccess === "function") {
           onUploadSuccess();
         }
       })
       .catch((error) => {
-        setStatusMessage("Upload failed - " + error);
-        alert("Upload failed: " + error);
+        const errorMessage = error.message || "Unknown error occurred";
+        setStatusMessage("Upload failed - " + errorMessage);
+        alert("Upload failed: " + errorMessage);
       });
   };
 
