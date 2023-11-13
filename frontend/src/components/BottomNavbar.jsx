@@ -45,11 +45,13 @@ export default function BottomNavbar() {
           navigate(newValue);
         }}
       >
-        <BottomNavigationAction
-          label="Timetable"
-          value="/Timetable"
-          icon={<CalendarMonthIcon />}
-        />
+        {authenticatedUser && (
+          <BottomNavigationAction
+            label="Timetable"
+            value="/Timetable"
+            icon={<CalendarMonthIcon />}
+          />
+        )}
         {authenticatedUser && (
           <BottomNavigationAction
             label="Bookings"
@@ -57,11 +59,13 @@ export default function BottomNavbar() {
             icon={<FormatListBulletedIcon />}
           />
         )}
-        <BottomNavigationAction
-          label="Blog"
-          value="/Blog"
-          icon={<CommentIcon />}
-        />
+        {authenticatedUser && (
+          <BottomNavigationAction
+            label="Blog"
+            value="/Blog"
+            icon={<CommentIcon />}
+          />
+        )}
         {authenticatedUser && (
           <BottomNavigationAction
             label="Profile"
