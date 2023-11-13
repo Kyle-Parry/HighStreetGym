@@ -76,16 +76,22 @@ function Header() {
                 >
                   <ListItemText primary="Import Class" />
                 </ListItem>
-                <ListItem
-                  button
-                  key="ImportBlog"
-                  component={Link}
-                  to="/ImportBlog"
-                >
-                  <ListItemText primary="Import Blog" />
-                </ListItem>
               </>
             )}
+            {authenticatedUser &&
+              (authenticatedUser.role === "admin" ||
+                authenticatedUser.role === "user") && (
+                <>
+                  <ListItem
+                    button
+                    key="ImportBlog"
+                    component={Link}
+                    to="/ImportBlog"
+                  >
+                    <ListItemText primary="Import Blog" />
+                  </ListItem>
+                </>
+              )}
           </List>
 
           <Divider />

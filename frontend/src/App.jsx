@@ -64,7 +64,7 @@ function App() {
         <Route
           path="/ImportBlog"
           element={
-            <RestrictedRoute allowedRoles={["admin"]}>
+            <RestrictedRoute allowedRoles={["admin", "user"]}>
               <ImportBlogPage />
             </RestrictedRoute>
           }

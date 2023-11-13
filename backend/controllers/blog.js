@@ -62,7 +62,7 @@ blogController.get("/:id", auth(["admin", "user"]), async (req, res) => {
   }
 });
 
-blogController.post("/upload/xml", auth(["admin"]), (req, res) => {
+blogController.post("/upload/xml", auth(["admin", "user"]), (req, res) => {
   console.log(req.files);
   if (req.files && req.files["xml-file"]) {
     // Access the XML file as a string
