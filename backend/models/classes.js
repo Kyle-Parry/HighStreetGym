@@ -33,9 +33,8 @@ export async function getAll() {
       INNER JOIN
           location l ON c.locationId = l.locationId
       INNER JOIN
-          users u ON c.userId = u.userId;
-    
-
+          users u ON c.userId = u.userId
+          WHERE c.classDateTime > NOW();
     `;
 
   try {

@@ -48,6 +48,10 @@ export default function Timetable() {
     return acc;
   }, {});
 
+  const sortedClassesByDate = Object.entries(groupedClasses).sort(
+    (a, b) => new Date(a[0]) - new Date(b[0])
+  );
+
   async function handleBooking(classId) {
     if (!authenticatedUser) {
       alert("Please log in to book a class.");
@@ -91,7 +95,7 @@ export default function Timetable() {
       <Typography variant="h4" sx={{ mb: 4, mt: 3, textAlign: "center" }}>
         Timetable
       </Typography>
-      {Object.entries(groupedClasses).map(([formattedDate, classesForDate]) => (
+      {sortedClassesByDate.map(([formattedDate, classesForDate]) => (
         <Paper
           key={formattedDate}
           sx={{ p: 3, my: 2, backgroundColor: "white" }}
