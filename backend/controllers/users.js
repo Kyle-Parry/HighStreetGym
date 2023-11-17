@@ -80,25 +80,6 @@ userController.post("/logout", (req, res) => {
     });
 });
 
-userController.get("/:id", (req, res) => {
-  const userId = req.params.id;
-
-  getByID(userId)
-    .then((user) => {
-      res.status(200).json({
-        status: 200,
-        message: "Get user by ID",
-        user: user,
-      });
-    })
-    .catch((error) => {
-      res.status(500).json({
-        status: 500,
-        message: "Failed to get user by ID",
-      });
-    });
-});
-
 userController.get("/key/:authKey", (req, res) => {
   const authKey = req.params.authKey;
 
@@ -272,12 +253,20 @@ userController.post(
     body("phone").isMobilePhone().trim(),
     body("firstName").notEmpty().trim().escape(),
     body("lastName").notEmpty().trim().escape(),
-    body("address").trim().escape(),
-    body("addressTwo").trim().escape(),
-    body("state").trim().escape(),
-    body("postCode").trim().escape(),
+    body("address").notEmpty().trim().escape(),
+    body("addressTwo").notEmpty().trim().escape(),
+    body("state").notEmpty().trim().escape(),
+    body("postCode").notEmpty().trim().escape(),
   ],
   async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        status: 400,
+        message: "Validation failed",
+        errors: errors.array(),
+      });
+    }
     const {
       email,
       password,
@@ -289,13 +278,6 @@ userController.post(
       state,
       postCode,
     } = req.body;
-
-    if (!password) {
-      return res.status(400).json({
-        status: 400,
-        message: "Password is required",
-      });
-    }
 
     // Hash the password if it isn't already hashed
     let hashedPassword = password;

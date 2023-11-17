@@ -163,8 +163,8 @@ export async function update(user) {
 
 export async function updateAuth(user) {
   // Update user record with the new authKey using an SQL UPDATE statement
-  const updateSql = "UPDATE users SET authKey = ? WHERE email = ?"; // Replace with the actual column names
-  const values = [user.authKey, user.email]; // Replace with the actual column names
+  const updateSql = "UPDATE users SET authKey = ? WHERE email = ?";
+  const values = [user.authKey, user.email];
 
   try {
     await db.query(updateSql, values);

@@ -34,6 +34,7 @@ const ProfilePage = () => {
   const [authenticatedUser] = useAuthentication();
   const formik = useFormik({
     initialValues: {
+      userId: authenticatedUser.userId || "",
       email: authenticatedUser.email || "",
       password: "",
       firstName: authenticatedUser.firstName || "",
@@ -68,6 +69,7 @@ const ProfilePage = () => {
   useEffect(() => {
     if (authenticatedUser) {
       formik.setValues({
+        userId: authenticatedUser.userId || "",
         email: authenticatedUser.email || "",
         password: "",
         firstName: authenticatedUser.firstName || "",
